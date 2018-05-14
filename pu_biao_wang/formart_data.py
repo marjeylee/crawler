@@ -5,7 +5,6 @@
 import json
 import os
 import re
-import uuid
 from collections import defaultdict
 
 from framework.utility.word_process import is_chinese_character, remove_bracket
@@ -126,16 +125,25 @@ def format_content(detail_obj):
 
 if __name__ == '__main__':
     o_list = get_original_list()
+
     f_list = []
     for obj in o_list:
         f_list.append(format_content(obj))
     c_dict = defaultdict(int)
+    for obj in f_list:
+        try:
+            c = obj['content']['功能']
+            for name in c:
+                c_dict[name] = c_dict[name] + 1
+        except Exception as e:
+            pass
+    c_dict = sorted(c_dict.items(), key=lambda d: d[1], reverse=True)
     for f in f_list:
         try:
-            if len(f['content']['处方+']) > 0 and len(f['content']['功能']) > 0 and len(f['content']['主治']) > 0:
-                json_str = json.dumps(f)
-                random_name = './format_data/' + str(uuid.uuid4())
-                with open(random_name, mode='w', encoding='utf8') as file:
-                    file.write(json_str)
-        except Exception as e:
-            print(e)
+            strs = f['content']['功能与主治']
+            if str(strs).index('急') > 0:
+                print(str(strs).index('急、'))
+                print(strs)
+                print(f['content']['功能和主治'])
+        except Exception:
+            pass
